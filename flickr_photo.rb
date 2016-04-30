@@ -18,17 +18,16 @@ module Jekyll
 				# auth
 				FlickRaw.api_key = context.registers[:site].config["flickr"]["api_key"]
 				FlickRaw.shared_secret = context.registers[:site].config["flickr"]["shared_secret"]
-#@api_key = context.registers[:site].config["flickr"]["api_key"]
         @photo.merge!(@@cached[photo_key] || get_photo)
-#puts( @photo[:source])
-        return "<div><a class=\"thumbnail\"><img src=\"#{@photo[:source]}\"></a></div>"
+        
+				return "<div class=\"thumbnail\"><img src=\"#{@photo[:source]}\"/>" + "<div class=\"caption\" style=\"text-align: right\">" + "<a href=\"#{@photo[:author_link]}\"><small>flickr photo by #{@photo[:author]}</small></a>" + "</div>" + "</div>"
     end
 
     def get_photo
-
 				info = flickr.photos.getInfo( :photo_id => @photo[:id])
 				@photo[:source] = FlickRaw.url( info)
-				@photo[:url] = FlickRaw.url( info)
+				@photo[:author] = info.owner[ "username"]
+				@photo[:author_link] = FlickRaw.url_photopage( info)
         @@cached[photo_key] = @photo
     end
 
