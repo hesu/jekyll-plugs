@@ -1,0 +1,43 @@
+require 'flickraw'
+require 'shellwords'
+
+module Jekyll
+
+  class FlickrPhotoTag < Liquid::Tag
+
+    @@cached = {} # Prevents multiple requests for the same photo
+
+    def initialize(tag_name, markup, tokens)
+      super
+      params = Shellwords.shellwords markup
+      @photo = { :id => params[0], :size => params[1] || "Medium", :sizes => {}, :title => "", :caption => "", :url => "", :exif => {} }
+
+    end
+
+    def render(context)
+				# auth
+				FlickRaw.api_key = context.registers[:site].config["flickr"]["api_key"]
+				FlickRaw.shared_secret = context.registers[:site].config["flickr"]["shared_secret"]
+#@api_key = context.registers[:site].config["flickr"]["api_key"]
+        @photo.merge!(@@cached[photo_key] || get_photo)
+#puts( @photo[:source])
+        return "<div><a class=\"thumbnail\"><img src=\"#{@photo[:source]}\"></a></div>"
+    end
+
+    def get_photo
+
+				info = flickr.photos.getInfo( :photo_id => @photo[:id])
+				@photo[:source] = FlickRaw.url( info)
+				@photo[:url] = FlickRaw.url( info)
+        @@cached[photo_key] = @photo
+    end
+
+    def photo_key
+        "#{@photo[:id]}"
+    end
+
+  end
+
+end
+
+Liquid::Template.register_tag('flickr_photo', Jekyll::FlickrPhotoTag)
