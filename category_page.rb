@@ -1,7 +1,6 @@
 module Jekyll 
-	
-	class CategoryPage < Page
-		def initialize( site, base, dir, name)
+  class CategoryPage < Page
+    def initialize( site, base, dir, name)
 #puts( "CategoryPage :: initialize()")
 			@site = site
 			@base = base
